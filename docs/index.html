@@ -5,311 +5,236 @@
   <title>NeuroSeg Meets DINOv3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: rgba(148, 163, 184, 0.35);
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --accent1: #22d3ee;
-      --accent2: #a855f7;
+    /* ---------- Global ---------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #000 55%);
-      color: var(--text);
-      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6; /* 淡灰色背景 */
+      color: #111827;           /* 深灰文字 */
       -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
     }
 
-    a { color: var(--accent1); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
 
     .page {
-      max-width: 1120px;
-      margin: 32px auto 64px auto;
-      padding: 0 16px;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 16px 64px 16px;
     }
 
-    /* hero */
-
+    /* ---------- Hero (Title) ---------- */
     .hero {
-      position: relative;
+      background: #ffffff;
       border-radius: 24px;
-      padding: 26px 22px 22px 22px;
-      background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%),
-        radial-gradient(circle at top right, rgba(168,85,247,0.22), transparent 60%),
-        #020617;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: 0 32px 80px rgba(15,23,42,0.9);
-    }
-
-    .scanline {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.04),
-        rgba(255,255,255,0.04) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      mix-blend-mode: soft-light;
-      pointer-events: none;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);
-      gap: 18px;
-      align-items: center;
-    }
-
-    .pill {
-      display: inline-flex;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      font-size: 2.3rem;
-      letter-spacing: 0.03em;
-      margin-bottom: 10px;
-    }
-
-    .gradient-text {
-      background: linear-gradient(120deg, #22d3ee, #a855f7, #f97316);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .subtitle {
-      font-size: 0.98rem;
-      color: var(--muted);
-      max-width: 32rem;
-      margin-bottom: 6px;
-    }
-
-    .links {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 7px 16px;
-      border-radius: 999px;
-      font-size: 0.88rem;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: rgba(15,23,42,0.9);
-      color: var(--text);
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-    }
-
-    .btn.primary {
-      border-color: transparent;
-      background-image: linear-gradient(120deg, #22c55e, #22d3ee);
-      color: #020617;
-      font-weight: 600;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 30px rgba(15,23,42,0.9);
-      text-decoration: none;
-    }
-
-    .hero-preview {
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: #020617;
-      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
-    }
-
-    .hero-preview img {
-      width: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    .hero-preview-caption {
-      padding: 8px 10px 10px 10px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      border-top: 1px solid rgba(148,163,184,0.4);
-      background: linear-gradient(to right, #020617, #020617 60%, #020617);
-    }
-
-    /* sections */
-
-    .main {
-      margin-top: 28px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);
-      gap: 18px;
-    }
-
-    section.card {
-      border-radius: 18px;
-      background: radial-gradient(circle at top left, rgba(34,211,238,0.05), transparent 60%),
-                  #020617;
-      border: 1px solid rgba(148,163,184,0.45);
-      padding: 18px 18px 20px 18px;
-    }
-
-    section.card h2 {
-      font-size: 1.05rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    section.card p {
-      font-size: 0.92rem;
-      color: var(--text);
-    }
-
-    .figure-card {
-      margin-top: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.4);
-      overflow: hidden;
-      background: #020617;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .figure-card img {
-      width: 100%;
-      display: block;
-    }
-
-    .figure-card .caption {
-      padding: 7px 9px 9px 9px;
-      border-top: 1px solid rgba(148,163,184,0.4);
-      background: linear-gradient(to right, #020617, #020617 60%, #020617);
-    }
-
-    footer {
-      margin-top: 26px;
+      padding: 40px 24px 32px 24px;
       text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+      margin-bottom: 32px;
     }
 
-    @media (max-width: 900px) {
-      .hero-content { grid-template-columns: minmax(0, 1fr); }
-      .main { grid-template-columns: minmax(0, 1fr); }
-      h1 { font-size: 1.8rem; }
-      .hero { padding: 22px 16px 18px 16px; }
+    .hero-title {
+      font-size: clamp(2rem, 3vw + 1rem, 2.8rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: #4b5563;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Generic sections ---------- */
+
+    .section {
+      border-radius: 24px;
+      padding: 32px 24px;
+      margin-bottom: 24px;
+      background: #ffffff;
+    }
+
+    .section.alt {
+      background: #f9fafb; /* 更浅一点的灰白，形成层次 */
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+
+    .section-body {
+      max-width: 860px;
+      margin: 0 auto;
+      font-size: 0.98rem;
+      color: #374151;
+    }
+
+    .section-body p + p {
+      margin-top: 0.75rem;
+    }
+
+    /* ---------- Figures ---------- */
+
+    .figure-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .figure-box {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .figure-caption {
+      font-size: 0.85rem;
+      color: #6b7280;
+      padding: 10px 14px 12px 14px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    /* ---------- Responsive tweaks ---------- */
+
+    @media (max-width: 640px) {
+      .hero {
+        padding: 28px 18px 24px 18px;
+        border-radius: 20px;
+      }
+
+      .section {
+        padding: 24px 18px;
+        border-radius: 20px;
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="scanline"></div>
-      <div class="hero-content">
-        <div>
-          <div class="pill">NeurINO • Neuron Segmentation</div>
-          <h1><span class="gradient-text">NeuroSeg Meets DINOv3</span></h1>
-          <p class="subtitle">
-            Transferring 2D self-supervised visual priors to 3D neuron segmentation
-            via DINOv3-initialized MedNeXt-style architectures.
-          </p>
 
-          <div class="links">
-            <!-- 论文出来后把 # 换成 arXiv 链接 -->
-            <a class="btn primary" href="#" target="_blank" rel="noopener">Paper (coming soon)</a>
-          </div>
-        </div>
+    <!-- Title -->
+    <header class="hero">
+      <h1 class="hero-title">
+        NeuroSeg Meets DINOv3: Transferring 2D Self-Supervised Visual Priors
+        to 3D Neuron Segmentation via DINOv3 Initialization
+      </h1>
+      <p class="hero-subtitle">
+        A framework for bringing powerful 2D DINOv3 ConvNeXt representations into 3D neuron segmentation,
+        improving thin-structure reconstruction and label efficiency.
+      </p>
+    </header>
 
-        <!-- Teaser image -->
-        <div class="hero-preview">
-          <img src="teaser.png" alt="Teaser figure for NeurINO" />
-          <div class="hero-preview-caption">
-            Teaser. NeurINO injects DINOv3 ConvNeXt priors into a 3D neuron segmentation framework,
-            improving thin-structure reconstruction and label efficiency.
+    <!-- Teaser image -->
+    <section class="section">
+      <h2 class="section-title">Teaser</h2>
+      <div class="figure-wrapper">
+        <div class="figure-box">
+          <img src="teaser.png" alt="NeurINO teaser figure" />
+          <div class="figure-caption">
+            NeurINO transfers self-supervised 2D DINOv3 priors into a 3D segmentation framework,
+            leading to improved reconstruction of fine neuronal structures.
           </div>
         </div>
       </div>
     </section>
 
-    <!-- MAIN SECTIONS -->
-    <div class="main">
-      <!-- Abstract -->
-      <section class="card" id="abstract">
-        <h2>Abstract</h2>
+    <!-- Abstract -->
+    <section class="section alt" id="abstract">
+      <h2 class="section-title">Abstract</h2>
+      <div class="section-body">
         <p>
-          <!-- 在这里粘贴论文的 abstract 文本 -->
           High-quality 3D neuron segmentation is critical for neuroscience, but densely labeled
-          volumetric data are scarce and expensive to obtain. In contrast, large-scale 2D datasets
-          enable powerful self-supervised models such as DINOv3. We present <b>NeurINO</b>, a
-          framework that transfers 2D ConvNeXt-based DINOv3 visual priors to 3D neuron
-          segmentation by inflating kernels into a MedNeXt-style architecture and carefully
-          aligning normalization and feature statistics. Experiments on multiple neuron datasets
-          show consistent gains in segmentation quality and thin-structure recall, especially in
-          low-label regimes.
+          volumetric data are scarce and expensive to obtain. In contrast, 2D natural image datasets
+          enable powerful self-supervised models such as DINOv3.
         </p>
-      </section>
-
-      <!-- Method / Framework 图 -->
-      <section class="card" id="method">
-        <h2>Method</h2>
         <p>
-          <!-- 这里写 3~4 句方法概要，和文章中的 method 对应 -->
-          NeurINO keeps the overall encoder–decoder design simple: a DINOv3 ConvNeXt encoder
-          inflated into 3D, followed by a MedNeXt-style decoder tailored for neuron morphology.
+          We propose <strong>NeurINO</strong>, a framework that transfers 2D ConvNeXt-based DINOv3
+          visual priors to 3D neuron segmentation by inflating kernels into a 3D architecture and
+          carefully aligning feature statistics and normalization. Experiments on multiple neuron
+          datasets show consistent gains in segmentation quality and thin-structure recall,
+          especially in low-label regimes.
         </p>
-        <div class="figure-card">
+      </div>
+    </section>
+
+    <!-- Method / Framework -->
+    <section class="section" id="method">
+      <h2 class="section-title">Method / Framework</h2>
+      <div class="section-body">
+        <p>
+          NeurINO adopts a simple encoder–decoder design. A 2D DINOv3 ConvNeXt backbone is first
+          converted into a 3D encoder by inflating convolutional kernels and adapting
+          downsampling stages. The encoder is then coupled with a lightweight 3D decoder tailored
+          to neuron morphology, with careful normalization replacement and optional bottleneck
+          blocks to stabilize training.
+        </p>
+        <p>
+          This design keeps most of the strong 2D visual priors while remaining compatible with
+          standard 3D medical-imaging-style training pipelines.
+        </p>
+      </div>
+
+      <div class="figure-wrapper" style="margin-top: 20px;">
+        <div class="figure-box">
           <img src="method.png" alt="NeurINO method / framework diagram" />
-          <div class="caption">
-            Framework. 2D DINOv3 ConvNeXt stages are inflated into 3D and plugged into a
-            MedNeXt-style decoder for volumetric neuron segmentation.
+          <div class="figure-caption">
+            Overall framework. 2D DINOv3 ConvNeXt stages are inflated into 3D and plugged into a
+            neuron-centric 3D decoder for volumetric segmentation.
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
 
-    <div class="main" style="margin-top:18px;">
-      <!-- Results -->
-      <section class="card" id="results">
-        <h2>Results</h2>
+    <!-- Results -->
+    <section class="section alt" id="results">
+      <h2 class="section-title">Results</h2>
+      <div class="section-body">
         <p>
-          <!-- 这里写一句 overall conclusion + 一句 label efficiency / qualitative 好处 -->
-          NeurINO improves over strong 3D baselines on several neuron datasets, with higher Dice
-          scores and better preservation of thin neurites. The transfer of DINOv3 priors makes the
-          model notably more label-efficient.
+          Across several neuron datasets, NeurINO improves over strong 3D baselines in terms of
+          Dice score and topological accuracy. The model better preserves long, thin neurites and
+          reduces merge/split errors, particularly when only limited manual annotations are
+          available.
         </p>
-        <div class="figure-card">
+        <p>
+          Qualitative visualizations highlight cleaner branch reconstruction and fewer broken
+          structures, demonstrating the benefit of transferring 2D DINOv3 priors into 3D.
+        </p>
+      </div>
+
+      <div class="figure-wrapper" style="margin-top: 20px;">
+        <div class="figure-box">
           <img src="results.png" alt="NeurINO qualitative and quantitative results" />
-          <div class="caption">
-            Visual results. Compared with baseline 3D models, NeurINO reduces merge/split errors
-            and preserves fine neuron branches.
+          <div class="figure-caption">
+            Example results. NeurINO produces more complete neuron reconstructions and reduces
+            topological errors compared with baseline 3D segmentation models.
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
+  </div>
 </body>
 </html>
